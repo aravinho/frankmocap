@@ -17,7 +17,7 @@ except ImportError:
     print("Cannot import OpendrRenderer")
 
 try:
-    from .p3d_renderer import Pytorch3dRenderer
+    from renderer.p3d_renderer import Pytorch3dRenderer
     g_valid_visualize = True
 except ImportError:
     print("Cannot import Pytorch3dRenderer")

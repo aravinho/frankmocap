@@ -1,6 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 
 import os, sys, shutil
+import rospy
+import ipdb
 import os.path as osp
 import numpy as np
 import cv2
@@ -28,7 +30,9 @@ def run_hand_mocap(args, bbox_detector, hand_mocap, visualizer):
     cur_frame = args.start_frame
     video_frame = 0
 
+    # rate = rospy.Rate(20)
     while True:
+        # rate.sleep()
         # load data
         load_bbox = False
 
@@ -63,13 +67,18 @@ def run_hand_mocap(args, bbox_detector, hand_mocap, visualizer):
                     gnu.make_subdir(image_path)
                     cv2.imwrite(image_path, img_original_bgr)
         
-        elif input_type == 'webcam':
+        elif input_type == 'webcam' or input_type == "roscam":
             _, img_original_bgr = input_data.read()
+            if img_original_bgr is None:
+                raise ValueError("NONE UMAGE")
+            else:
+                print(f"Got image!")
 
             if video_frame < cur_frame:
+                print(f"incrementing video_frame {video_frame} cur_frame {cur_frame}")
                 video_frame += 1
                 continue
-            # save the obtained video frames
+            # # save the obtained video frames
             image_path = osp.join(args.out_dir, "frames", f"scene_{cur_frame:05d}.jpg")
             if img_original_bgr is not None:
                 video_frame += 1

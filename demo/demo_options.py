@@ -24,6 +24,7 @@ class DemoOptions():
 
         # output options
         parser.add_argument('--out_dir', type=str, default=None, help='Folder of output images.')
+        parser.add_argument('--seq_name', type=str, default=None, help='Idk required for webcam.')
         # parser.add_argument('--pklout', action='store_true', help='Export mocap output as pkl file')
         parser.add_argument('--save_bbox_output', action='store_true', help='Save the bboxes in json files (bbox_xywh format)')
         parser.add_argument('--save_pred_pkl', action='store_true', help='Save the predictions (bboxes, params, meshes in pkl format')

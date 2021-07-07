@@ -1,13 +1,20 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+import _thread as thread
 
 import os, sys, shutil
 import os.path as osp
 import cv2
+import ipdb
 from collections import OrderedDict
 import mocap_utils.general_utils as gnu
 import numpy as np
 import json
 import subprocess as sp
+import rospy
+import roslib
+from sensor_msgs.msg import Image
+from sensor_msgs.msg import CameraInfo
+import std_msgs
 
 
 def setup_render_out(out_dir):
@@ -51,6 +58,8 @@ def __get_input_type(args):
             input_type ='image_dir'
     elif args.input_path =='webcam':
         input_type ='webcam'
+    elif args.input_path == "roscam":
+        input_type = "roscam"
     else:
         assert False, "Unknown input path. It should be an image," + \
             "or an image folder, or a video file, or \'webcam\' "
@@ -83,6 +92,21 @@ def __img_seq_setup(args):
     mocap_out_dir = osp.join(args.out_dir, "mocap")
     gnu.build_dir(mocap_out_dir)
 
+class ROSWebcamReader:
+
+    def __init__(self):
+        self.image = None
+        rospy.init_node('python_listener', anonymous=True)
+        rospy.Subscriber("/camera/color/image_raw/", Image, self.callback)
+
+    def callback(self, msg):
+        # Try to convert the ROS Image message to a CV2 Image
+        cv_im = np.flip(np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.width, -1),2)
+        # set this as the latest
+        self.image = cv_im
+
+    def read(self):
+        return None, self.image
 
 def setup_input(args):
     """
@@ -109,6 +133,13 @@ def setup_input(args):
     elif input_type =='webcam':
         cap = cv2.VideoCapture(0)       #webcam input
         return input_type, cap
+
+    elif input_type == "roscam":
+        sub = ROSWebcamReader()
+        # ipdb.set_trace()
+        # while not rospy.is_shutdown():    # Loop to keep the program from shutting down unless ROS is shut down, or CTRL+C is pressed
+        #     rospy.spin()
+        return input_type, sub
 
     elif input_type =='image_dir':
         image_list = gnu.get_all_files(args.input_path, image_exts, "relative") 
