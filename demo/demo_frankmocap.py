@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+import rospy
 
 import os
 import sys
@@ -53,6 +54,7 @@ def run_regress(
     # use pre-computed bbox or use slow detection mode
     if cond1 or cond2:
         if not cond1 and cond2:
+            print(f"running hand detection")
             # run detection only when bbox is not available
             body_pose_list, body_bbox_list, hand_bbox_list, _ = \
                 bbox_detector.detect_hand_bbox(img_original_bgr.copy())
@@ -113,7 +115,12 @@ def run_frank_mocap(args, bbox_detector, body_mocap, hand_mocap, visualizer):
 
     cur_frame = args.start_frame
     video_frame = 0
+
+    if input_type == "roscam":
+        rate = rospy.Rate(1)
     while True:
+        if input_type == "roscam":
+            rate.sleep()
         # load data
         load_bbox = False
 
@@ -147,7 +154,7 @@ def run_frank_mocap(args, bbox_detector, body_mocap, hand_mocap, visualizer):
                     gnu.make_subdir(image_path)
                     cv2.imwrite(image_path, img_original_bgr)
         
-        elif input_type == 'webcam':
+        elif input_type == 'webcam' or input_type == "roscam":
             _, img_original_bgr = input_data.read()
 
             if video_frame < cur_frame:

@@ -8,6 +8,7 @@ Visualizing 3D humans via Opengl
 
 """
 import numpy as np
+import ipdb
 import cv2
 import torch
 from renderer import viewer2D#, glViewer, glRenderer
@@ -131,6 +132,7 @@ class Visualizer(object):
             mesh_offset[:,1] -= img_original.shape[0]*0.5
             pred_mesh_list_offset.append( {'ver': mesh_offset, 'f':mesh['faces'] })# verts = mesh['vertices']
             # faces = mesh['faces']
+
         if self.rendererType =="opengl_gui":
             self._visualize_gui_naive(pred_mesh_list_offset, img_original=res_img)
             overlaidImg = None

@@ -13,6 +13,7 @@ import pickle
 from datetime import datetime
 
 from demo.demo_options import DemoOptions
+import rospy
 from bodymocap.body_mocap_api import BodyMocap
 from bodymocap.body_bbox_detector import BodyPoseEstimator
 import mocap_utils.demo_utils as demo_utils
@@ -29,7 +30,12 @@ def run_body_mocap(args, body_bbox_detector, body_mocap, visualizer):
     cur_frame = args.start_frame
     video_frame = 0
     timer = Timer()
+
+    if input_type == "roscam":
+        rate = rospy.Rate(1)
     while True:
+        if input_type == "roscam":
+            rate.sleep()
         timer.tic()
         # load data
         load_bbox = False
@@ -65,7 +71,7 @@ def run_body_mocap(args, body_bbox_detector, body_mocap, visualizer):
                     gnu.make_subdir(image_path)
                     cv2.imwrite(image_path, img_original_bgr)
 
-        elif input_type == 'webcam':    
+        elif input_type == 'webcam' or input_type == "roscam":    
             _, img_original_bgr = input_data.read()
 
             if video_frame < cur_frame:

@@ -2,6 +2,7 @@
 
 import os, sys, shutil
 import os.path as osp
+import ipdb
 import torch
 import numpy as np
 import cv2
@@ -12,8 +13,16 @@ from handmocap.hand_modules.h3dw_model import H3DWModel
 from mocap_utils.coordconv import convert_smpl_to_bbox, convert_bbox_to_oriIm
 
 
+default_checkpoint_hand = "./extra_data/hand_module/pretrained_weights/pose_shape_best.pth"
+
 class HandMocap:
-    def __init__(self, regressor_checkpoint, smpl_dir, device = torch.device('cuda') , use_smplx = False):
+    def __init__(
+        self,
+        regressor_checkpoint=default_checkpoint_hand,
+        smpl_dir='./extra_data/smpl/',
+        device = torch.device('cuda'),
+        use_smplx = False
+    ):
         #For image transform
         transform_list = [ transforms.ToTensor(),
                           transforms.Normalize((0.5, 0.5, 0.5),
@@ -116,7 +125,7 @@ class HandMocap:
         return img_cropped, norm_img, bbox_scale_ratio, bbox_processed
 
 
-    def regress(self, img_original, hand_bbox_list, add_margin=False):
+    def regress(self, img_original, hand_bbox_list, add_margin=False, frame_idx=None):
         """
             args: 
                 img_original: original raw image (BGR order by using cv2.imread)
@@ -207,6 +216,8 @@ class HandMocap:
                             vert_smplcoord, cam_scale, cam_trans, bAppTransFirst=True) # SMPL space -> bbox space
                         joints_bboxcoord = convert_smpl_to_bbox(
                             joints_smplcoord, cam_scale, cam_trans, bAppTransFirst=True) # SMPL space -> bbox space
+                        pred_output[hand_type]["pred_vertices_bbox"] = vert_bboxcoord.copy()
+                        pred_output[hand_type]["pred_joints_bbox"] = joints_bboxcoord.copy()
 
                         hand_boxScale_o2n = pred_output[hand_type]['bbox_scale_ratio']
                         hand_bboxTopLeft = pred_output[hand_type]['bbox_top_left']

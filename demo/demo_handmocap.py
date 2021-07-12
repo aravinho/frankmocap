@@ -30,7 +30,7 @@ def run_hand_mocap(args, bbox_detector, hand_mocap, visualizer):
     cur_frame = args.start_frame
     video_frame = 0
 
-    # rate = rospy.Rate(20)
+    # rate = rospy.Rate(1)
     while True:
         # rate.sleep()
         # load data
@@ -70,7 +70,7 @@ def run_hand_mocap(args, bbox_detector, hand_mocap, visualizer):
         elif input_type == 'webcam' or input_type == "roscam":
             _, img_original_bgr = input_data.read()
             if img_original_bgr is None:
-                raise ValueError("NONE UMAGE")
+                print("NONE UMAGE")
             else:
                 print(f"Got image!")
 
@@ -120,7 +120,7 @@ def run_hand_mocap(args, bbox_detector, hand_mocap, visualizer):
     
         # Hand Pose Regression
         pred_output_list = hand_mocap.regress(
-                img_original_bgr, hand_bbox_list, add_margin=True)
+                img_original_bgr, hand_bbox_list, add_margin=True, frame_idx=video_frame)
         assert len(hand_bbox_list) == len(body_bbox_list)
         assert len(body_bbox_list) == len(pred_output_list)
 

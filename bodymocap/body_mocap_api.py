@@ -14,8 +14,17 @@ from mocap_utils.coordconv import convert_smpl_to_bbox, convert_bbox_to_oriIm
 import mocap_utils.geometry_utils as gu
 
 
+default_checkpoint_body_smplx = './extra_data/body_module/pretrained_weights/smplx-03-28-46060-w_spin_mlc3d_46582-2089_2020_03_28-21_56_16.pt'
+default_smpl_dir = './extra_data/smpl/'
+
 class BodyMocap(object):
-    def __init__(self, regressor_checkpoint, smpl_dir, device=torch.device('cuda'), use_smplx=False):
+    def __init__(
+        self,
+        regressor_checkpoint=default_checkpoint_body_smplx,
+        smpl_dir=default_smpl_dir,
+        device=torch.device('cuda'),
+        use_smplx=False
+    ):
 
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
